@@ -1,4 +1,4 @@
-package com.itrex.collector;
+package com.itrex.maklerplus.collector;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
