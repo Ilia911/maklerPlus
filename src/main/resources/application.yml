@@ -1,0 +1,22 @@
+spring:
+  data:
+    mongodb:
+      host: "localhost"
+      port: 27017
+      database: "maklerplus"
+      username: "user"
+      password: "password"
+  kafka:
+    bootstrap-servers:
+      - localhost:29092
+      - localhost:39092
+      - localhost:49092
+    consumer:
+      group-id: 1
+topic:
+  telegram:
+    receive: "telegramAPI_primaryDataCollector"
+  advert:
+    send: "primaryDataCollector_finalDataPreparator"
+server:
+  port: 8090
