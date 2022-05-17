@@ -1,5 +1,6 @@
 package com.itrex.maklerplus.collector.entity;
 
+import java.util.Date;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,7 +17,13 @@ public class AdvertMessage {
 
   private String text;
 
-  private long date;
+  private long nativeCreatedTime;
 
   private HostAPIEnum hostAPIEnum;
+
+  private StatusCodeEnum statusCode = StatusCodeEnum.IN_PROCESS;
+
+  private byte attemptsCount = 1;
+
+  private long createdTime = new Date().getTime();
 }
