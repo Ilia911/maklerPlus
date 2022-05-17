@@ -17,7 +17,7 @@ public class TelegramMessageParserUtil {
   private static final String TEXT_PATTERN = "text = \"(.*?)\"";
   private static final String NATIVE_ID_PATTERN = "id = (\\d*)";
   private static final String CHAT_ID_PATTERN = "chatId = (.?\\d*)";
-  private static final String DATE_PATTERN = "date = (\\d*)";
+  private static final String NATIVE_CREATED_TIME_PATTERN = "date = (\\d*)";
   private static final String MESSAGES_SPLIT_PATTERN = "Message \\{";
   private static final int MINIMUM_LENGTH = 10;
 
@@ -36,7 +36,7 @@ public class TelegramMessageParserUtil {
         advertMessage.setText(text);
         advertMessage.setNativeId(retrieveStringByPattern(message, NATIVE_ID_PATTERN));
         advertMessage.setChatId(retrieveStringByPattern(message, CHAT_ID_PATTERN));
-        advertMessage.setDate(retrieveDateInMilliseconds(message));
+        advertMessage.setNativeCreatedTime(retrieveDateInMilliseconds(message));
         advertMessage.setHostAPIEnum(HostAPIEnum.TELEGRAM);
         advertMessageList.add(advertMessage);
       }
@@ -46,7 +46,7 @@ public class TelegramMessageParserUtil {
 
   private Long retrieveDateInMilliseconds(String message) {
 
-    String dateInSeconds = retrieveStringByPattern(message, DATE_PATTERN);
+    String dateInSeconds = retrieveStringByPattern(message, NATIVE_CREATED_TIME_PATTERN);
 
     return Long.parseLong(dateInSeconds) * 1000;
   }

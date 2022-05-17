@@ -1,7 +1,7 @@
 package com.itrex.maklerplus.collector.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.itrex.maklerplus.collector.entity.AdvertMessage;
 import java.util.List;
@@ -42,7 +42,7 @@ class TelegramMessageParserUtilTest {
     assertEquals(
         "Аренда каартиры в тбилиси 800 $ 70 ка около метро სადგურის მოედანი #rent #apartment",
         advertMessages.get(0).getText());
-    assertEquals(1647239243000L, advertMessages.get(0).getDate());
+    assertEquals(1647239243000L, advertMessages.get(0).getNativeCreatedTime());
   }
 
   @Test
