@@ -20,3 +20,8 @@ topic:
     send: "primaryDataCollector_finalDataPreparator"
 server:
   port: 8090
+scheduler:
+  resend:
+    delay: "1800000"
+    wait: 600000
+    attempts.count: 3
