@@ -43,17 +43,20 @@ public class AdvertServiceImpl implements AdvertService {
     if (advertMessageList.size() > 0) {
       List<AdvertMessage> savedAdvertMessages = advertRepository.saveAll(advertMessageList);
       log.debug("Saved Adverts: {}", savedAdvertMessages);
-      sendAdverts(advertMessageList);
+
+      for (AdvertMessage advertMessage : advertMessageList) {
+        sendAdvertMessage(advertMessage);
+      }
     }
   }
 
-  private void sendAdverts(List<AdvertMessage> advertMessageList) throws ServiceException {
-    for (AdvertMessage advertMessage : advertMessageList) {
-      try {
-        kafkaProducer.send(sendTopic, objectMapper.writeValueAsString(advertMessage));
-      } catch (JsonProcessingException e) {
-        throw new ServiceException(e);
-      }
+  @Override
+  public void sendAdvertMessage(AdvertMessage advertMessage) throws ServiceException {
+    try {
+      kafkaProducer.send(sendTopic, objectMapper.writeValueAsString(advertMessage));
+    } catch (JsonProcessingException e) {
+      log.error("Sending message FAILED! message: {}", advertMessage);
+      throw new ServiceException(e);
     }
   }
 
