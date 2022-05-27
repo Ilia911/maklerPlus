@@ -1,9 +1,8 @@
 package com.itrex.maklerplus.collector.entity;
 
-public enum StatusCodeEnum {
+public enum StatusEnum {
   IN_PROCESS,
-  SUCCESS,
+  COMPLETED,
   ATTEMPTS_EXPIRED,
-  INVALID_DATA,
-  FAILED
+  INVALID
 }
