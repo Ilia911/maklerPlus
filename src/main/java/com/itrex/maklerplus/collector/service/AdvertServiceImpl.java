@@ -3,6 +3,9 @@ package com.itrex.maklerplus.collector.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itrex.maklerplus.collector.entity.AdvertMessage;
+import com.itrex.maklerplus.collector.entity.AdvertMessageDto;
+import com.itrex.maklerplus.collector.entity.AdvertMessageResponseDto;
+import com.itrex.maklerplus.collector.entity.StatusEnum;
 import com.itrex.maklerplus.collector.exception.ServiceException;
 import com.itrex.maklerplus.collector.kafka.KafkaProducer;
 import com.itrex.maklerplus.collector.repository.AdvertRepository;
@@ -11,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,9 +31,10 @@ public class AdvertServiceImpl implements AdvertService {
   private final TelegramMessageParserUtil messageParser;
   private final KafkaProducer kafkaProducer;
 
+  private static final String SUCCESS_CODE = "SUCCESS";
   private final ObjectMapper objectMapper = new ObjectMapper();
 
-  @Value("${topic.advert.send}")
+  @Value("${topic.final-preparator.send}")
   private String sendTopic;
 
   @Override
@@ -53,10 +58,53 @@ public class AdvertServiceImpl implements AdvertService {
   @Override
   public void sendAdvertMessage(AdvertMessage advertMessage) throws ServiceException {
     try {
-      kafkaProducer.send(sendTopic, objectMapper.writeValueAsString(advertMessage));
+      AdvertMessageDto advertMessageDto = convertAdvertMessageIntoAdvertMessageDto(advertMessage);
+      kafkaProducer.send(sendTopic, objectMapper.writeValueAsString(advertMessageDto));
     } catch (JsonProcessingException e) {
-      log.error("Sending message FAILED! message: {}", advertMessage);
-      throw new ServiceException(e);
+      throw new ServiceException(
+          String.format("Sending message FAILED! message: %s", advertMessage), e);
+    }
+  }
+
+  @Override
+  @Transactional
+  public void processFinalPreparatorResponse(String response) throws ServiceException {
+
+    AdvertMessageResponseDto responseEntity;
+    try {
+      responseEntity = objectMapper.readValue(response, AdvertMessageResponseDto.class);
+    } catch (JsonProcessingException e) {
+      throw new ServiceException(
+          String.format("Reading response FAILED! response: %s", response), e);
+    }
+    Optional<AdvertMessage> optional = advertRepository.findById(responseEntity.getId());
+
+    if (optional.isPresent()) {
+      updateAdvertMessage(responseEntity, optional.get());
+      advertRepository.save(optional.get());
+    } else {
+      log.error("AdvertMessage with id: {} does not exist", responseEntity.getId());
+    }
+  }
+
+  private AdvertMessageDto convertAdvertMessageIntoAdvertMessageDto(AdvertMessage advertMessage) {
+    return AdvertMessageDto.builder()
+        .id(advertMessage.getId())
+        .message(advertMessage.getText())
+        .build();
+  }
+
+  private void updateAdvertMessage(
+      AdvertMessageResponseDto responseDto, AdvertMessage advertMessage) {
+
+    String status = responseDto.getRespCode();
+
+    if (SUCCESS_CODE.equals(status)) {
+      advertMessage.setStatus(StatusEnum.COMPLETED);
+      advertMessage.setRespCode(status);
+    } else {
+      advertMessage.setStatus(StatusEnum.INVALID);
+      advertMessage.setRespCode(status);
     }
   }
 
@@ -66,7 +114,7 @@ public class AdvertServiceImpl implements AdvertService {
       return advertMessageList;
     }
 
-    String hostApiEnum = advertMessageList.get(0).getHostAPIEnum().toString();
+    String hostApiEnum = advertMessageList.get(0).getHostAPIEnum().name();
     Map<String, List<AdvertMessage>> preparedDataForQuery =
         advertMessageList.stream().collect(Collectors.groupingBy(AdvertMessage::getChatId));
     List<AdvertMessage> advertMessagesFromDatabase =

@@ -1,7 +1,7 @@
 package com.itrex.maklerplus.collector.scheduler;
 
 import com.itrex.maklerplus.collector.entity.AdvertMessage;
-import com.itrex.maklerplus.collector.entity.StatusCodeEnum;
+import com.itrex.maklerplus.collector.entity.StatusEnum;
 import com.itrex.maklerplus.collector.exception.ServiceException;
 import com.itrex.maklerplus.collector.repository.AdvertRepository;
 import com.itrex.maklerplus.collector.service.AdvertService;
@@ -32,15 +32,15 @@ public class AdvertMessageResendScheduler {
   public void resendAndUpdateAdvertMessages() throws ServiceException {
 
     List<AdvertMessage> advertMessages =
-        advertRepository.findByStatusCodeAndCreatedTime(
-            StatusCodeEnum.IN_PROCESS.toString(), System.currentTimeMillis() - waitTime);
+        advertRepository.findByStatusAndCreatedTime(
+            StatusEnum.IN_PROCESS.name(), System.currentTimeMillis() - waitTime);
 
     for (AdvertMessage advertMessage : advertMessages) {
       if (advertMessage.getAttemptsCount() < maxAttemptsCount) {
         advertService.sendAdvertMessage(advertMessage);
         advertMessage.setAttemptsCount((byte) (advertMessage.getAttemptsCount() + 1));
       } else {
-        advertMessage.setStatusCode(StatusCodeEnum.ATTEMPTS_EXPIRED);
+        advertMessage.setStatus(StatusEnum.ATTEMPTS_EXPIRED);
       }
     }
     advertRepository.saveAll(advertMessages);

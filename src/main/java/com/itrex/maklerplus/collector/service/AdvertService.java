@@ -8,4 +8,6 @@ public interface AdvertService {
   void processMessagesFromKafka(String message) throws ServiceException;
 
   void sendAdvertMessage(AdvertMessage advertMessage) throws ServiceException;
+
+  void processFinalPreparatorResponse(String response) throws ServiceException;
 }
