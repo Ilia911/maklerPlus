@@ -53,7 +53,7 @@ public class TelegramMessageParserUtil {
 
   private String retrieveStringByPattern(String message, String stringPattern) {
 
-    Pattern pattern = Pattern.compile(stringPattern);
+    Pattern pattern = Pattern.compile(stringPattern, Pattern.DOTALL);
     Matcher matcher = pattern.matcher(message);
 
     String result = "";
