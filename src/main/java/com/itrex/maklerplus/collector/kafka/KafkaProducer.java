@@ -13,7 +13,7 @@ public class KafkaProducer {
   private final KafkaTemplate<String, String> kafkaTemplate;
 
   public void send(String topic, String payload) {
-    log.info("sending payload='{}' to topic='{}'", payload, topic);
     kafkaTemplate.send(topic, payload);
+    log.info("Sent AdvertMessageDto: '{}'. To topic: '{}'", payload, topic);
   }
 }

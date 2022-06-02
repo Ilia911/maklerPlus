@@ -16,12 +16,17 @@ public class KafkaReceiver {
 
   @KafkaListener(topics = "${topic.telegram.receive}")
   public void receiveMessagesFromTelegram(String messages) throws ServiceException {
+    log.info(
+        "Received messages: '{}...' From topic: '{}'",
+        messages.substring(0, 44),
+        "${topic.telegram.receive}");
     advertService.processMessagesFromKafka(messages);
   }
 
   @KafkaListener(topics = "${topic.final-preparator.receive}")
   public void receiveResponseFromFinalPreparator(String response) throws ServiceException {
-    log.info("Received response: {} from topic: {}", response, "${topic.final-preparator.receive}");
+    log.info(
+        "Received response: '{}'. From topic: '{}'", response, "${topic.final-preparator.receive}");
     advertService.processFinalPreparatorResponse(response);
   }
 }
