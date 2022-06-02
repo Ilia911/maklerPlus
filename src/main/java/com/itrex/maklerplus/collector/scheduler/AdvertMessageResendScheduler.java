@@ -31,6 +31,7 @@ public class AdvertMessageResendScheduler {
   @Transactional
   public void resendAndUpdateAdvertMessages() throws ServiceException {
 
+    log.info("AdvertMessageResendScheduler started work!");
     List<AdvertMessage> advertMessages =
         advertRepository.findByStatusAndCreatedTime(
             StatusEnum.IN_PROCESS.name(), System.currentTimeMillis() - waitTime);
@@ -44,5 +45,7 @@ public class AdvertMessageResendScheduler {
       }
     }
     advertRepository.saveAll(advertMessages);
+    log.info("Updated AdvertMessages: '{}'", advertMessages);
+    log.info("AdvertMessageResendScheduler ended work!");
   }
 }

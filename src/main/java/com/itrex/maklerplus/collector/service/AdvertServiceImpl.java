@@ -47,7 +47,7 @@ public class AdvertServiceImpl implements AdvertService {
 
     if (advertMessageList.size() > 0) {
       List<AdvertMessage> savedAdvertMessages = advertRepository.saveAll(advertMessageList);
-      log.debug("Saved Adverts: {}", savedAdvertMessages);
+      log.info("Saved AdvertMessage entities: '{}'", savedAdvertMessages);
 
       for (AdvertMessage advertMessage : advertMessageList) {
         sendAdvertMessage(advertMessage);
@@ -62,7 +62,7 @@ public class AdvertServiceImpl implements AdvertService {
       kafkaProducer.send(sendTopic, objectMapper.writeValueAsString(advertMessageDto));
     } catch (JsonProcessingException e) {
       throw new ServiceException(
-          String.format("Sending message FAILED! message: %s", advertMessage), e);
+          String.format("Sending AdvertMessage FAILED! AdvertMessage: %s", advertMessage), e);
     }
   }
 
@@ -82,8 +82,9 @@ public class AdvertServiceImpl implements AdvertService {
     if (optional.isPresent()) {
       updateAdvertMessage(responseEntity, optional.get());
       advertRepository.save(optional.get());
+      log.info("Updated AdvertMessage: '{}'", optional.get());
     } else {
-      log.error("AdvertMessage with id: {} does not exist", responseEntity.getId());
+      log.error("AdvertMessage with id: '{}' does not exist", responseEntity.getId());
     }
   }
 
@@ -119,6 +120,7 @@ public class AdvertServiceImpl implements AdvertService {
         advertMessageList.stream().collect(Collectors.groupingBy(AdvertMessage::getChatId));
     List<AdvertMessage> advertMessagesFromDatabase =
         retrieveDataFromDatabase(hostApiEnum, preparedDataForQuery);
+    log.info("Found existed AdvertMessages: '{}'", advertMessagesFromDatabase);
 
     // "chatId-nativeId" is a pair that help to check equality of new objects and ones retrieved
     // from database

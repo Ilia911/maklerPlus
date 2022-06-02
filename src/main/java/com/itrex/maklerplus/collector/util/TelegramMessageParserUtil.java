@@ -29,7 +29,6 @@ public class TelegramMessageParserUtil {
     for (String message : messageArray) {
 
       String text = retrieveStringByPattern(message, TEXT_PATTERN);
-      log.debug("Retrieved text: {}", text);
 
       if (text.length() > MINIMUM_LENGTH) {
         AdvertMessage advertMessage = new AdvertMessage();
@@ -38,6 +37,7 @@ public class TelegramMessageParserUtil {
         advertMessage.setChatId(retrieveStringByPattern(message, CHAT_ID_PATTERN));
         advertMessage.setNativeCreatedTime(retrieveDateInMilliseconds(message));
         advertMessage.setHostAPIEnum(HostAPIEnum.TELEGRAM);
+        log.info("Created AdvertMessage entity: '{}'", advertMessage);
         advertMessageList.add(advertMessage);
       }
     }
