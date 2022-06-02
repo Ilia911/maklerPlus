@@ -1,28 +1,8 @@
-spring:
-  data:
-    mongodb:
-      host: "localhost"
-      port: 27017
-      database: "maklerplus"
-      username: "user"
-      password: "password"
-  kafka:
-    bootstrap-servers:
-      - localhost:29092
-      - localhost:39092
-      - localhost:49092
-    consumer:
-      group-id: 1
-topic:
-  telegram:
-    receive: "telegramAPI_primaryDataCollector"
-  final-preparator:
-    send: "primaryDataCollector_finalDataPreparator"
-    receive: "finalDataPreparator_primaryDataCollector"
 server:
   port: 8090
-scheduler:
-  resend:
-    delay: "120000"
-    wait: 50000
-    attempts.count: 3
+
+spring:
+  application:
+    name: primary-collector
+  config:
+    import: configserver:http://localhost:8888
