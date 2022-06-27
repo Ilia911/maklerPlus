@@ -9,7 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +27,7 @@ public class AdvertMessageResendScheduler {
   private final AdvertRepository advertRepository;
   private final AdvertService advertService;
 
-  @Scheduled(fixedRateString = "${scheduler.resend.delay}")
+  @Async
   @Transactional
   public void resendAndUpdateAdvertMessages() throws ServiceException {
 
